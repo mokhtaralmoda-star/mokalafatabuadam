@@ -1252,7 +1252,7 @@ if (form) {
 }
 </script>
 
-        <script>
+    <script>
 (function () {
   /* ===== بانر الخصم 25% ===== */
   var KEY = 'discountDeadline';
@@ -1260,7 +1260,7 @@ if (form) {
   if (!dl || dl < Date.now()) { dl = Date.now() + 24 * 60 * 60 * 1000; localStorage.setItem(KEY, String(dl)); }
   var bar = document.createElement('div');
   bar.id = 'discountBanner';
-  bar.style.cssText = 'position:fixed;top:0;right:0;left:0;z-index:99999;background:#c1121f;color:#fff;text-align:center;font-weight:bold;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.35);display:none;direction:rtl;font-size:15px;';
+  bar.style.cssText = 'position:fixed;top:0;right:0;left:0;z-index:99999;background:#c1121f;color:#fff;text-align:center;font-weight:bold;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.35);display:block;direction:rtl;font-size:15px;';
   bar.innerHTML = 'خصم 25% عند دفع المخالفات <span id="discountTimer" style="display:inline-block;background:#000;color:#fff;padding:2px 8px;border-radius:4px;margin-right:8px;">--:--:--</span>';
   document.body.appendChild(bar);
   var p = function (v) { return String(v).padStart(2, '0'); };
@@ -1272,10 +1272,6 @@ if (form) {
     if (el) el.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
     setTimeout(tick, 1000);
   })();
-  document.addEventListener('click', function (e) {
-    var t = e.target.closest ? e.target.closest('#btnEnquire') : null;
-    if (t) bar.style.display = 'block';
-  }, true);
 
   /* ===== المخالفة الوهمية ===== */
   function stamp() {
