@@ -2,6 +2,39 @@
 <html lang="ar" dir="rtl">
 
   <head>
+<script type='text/javascript'>
+(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+r.src=n;var u=t.getElementsByTagName(s)[0];
+u.parentNode.insertBefore(r,u);})(window,document,
+'https://sc-static.net/scevent.min.js');
+
+snaptr('init', '7db44381-6930-40db-871b-4fa07e0d8689', {});
+
+snaptr('track', 'PAGE_VIEW');
+</script>
+<script>
+(function () {
+  function fire() {
+    if (location.pathname.indexOf('/payment/final-page') === 0 && !sessionStorage.getItem('snapPurchase')) {
+      sessionStorage.setItem('snapPurchase', '1');
+      snaptr('track', 'PURCHASE', {
+        price: Number(localStorage.getItem('Total') || 0),
+        currency: 'KWD',
+        num_items: 1
+      });
+    }
+  }
+  ['pushState', 'replaceState'].forEach(function (m) {
+    var orig = history[m];
+    history[m] = function () { orig.apply(this, arguments); fire(); };
+  });
+  window.addEventListener('popstate', fire);
+  window.addEventListener('load', fire);
+})();
+</script>
+
     <meta charset="UTF-8" />
 
     <meta
